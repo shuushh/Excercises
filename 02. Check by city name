@@ -1,0 +1,39 @@
+// PRE REQUEST SCRIPT
+// Get "cities" variable
+let cities = pm.environment.get("cities");
+
+//Check if everything is ok for now
+console.log(cities);
+
+//Remove first index from array and set it as a variable
+let currentCity = cities.shift();
+//Set "cuurentCity" variable as a "city_name" variable
+pm.environment.set("city_name", currentCity);
+//Set new "cities" variable
+pm.environment.set("cities", cities);
+
+
+// TESTS SCRIPT
+let cities = pm.environment.get("cities");
+
+if (cities && cities.length >= 0){
+
+    pm.test("Status code is 200", () => {
+        pm.response.to.have.status(200);
+        pm.response.to.be.json; }
+        );
+
+    let jsonData = pm.response.json();
+
+    if(jsonData.name == pm.environment.get("city_name")) {
+        pm.test("A Perfect Match: " + jsonData.name + " = " + pm.environment.get("city_name"), () => {
+        pm.expect(jsonData.name).to.eql(pm.environment.get("city_name")); })
+        } else {
+        pm.test("Opps.. Check if a city name is correct", () => {
+        pm.expect(jsonData.name).to.eql(pm.environment.get("city_name")); })
+    }
+    postman.setNextRequest("Check coordinates support");
+} else {
+    pm.environment.unset("cities");
+    console.log("No more cities left. Resetting variable to initial array");
+}
