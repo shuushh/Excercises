@@ -1,0 +1,17 @@
+let latitude = pm.environment.get("longitude"); // longitude set as latitude
+let longitude = pm.environment.get("latitude"); // latitude set as longitude
+
+if (latitude.length && longitude.length > 0) {
+    pm.test("Status code is 200", () => {
+        pm.response.to.have.status(200);
+        pm.response.to.be.json;
+    });
+    postman.setNextRequest("Check city name");
+} else {
+    pm.test("Status code is 200", () => {
+        pm.response.to.have.status(200);
+        pm.response.to.be.json;
+    });
+    console.log("No more coordinates left. Resetting variable to initial array");
+    postman.setNextRequest("Schema Validation");
+}
