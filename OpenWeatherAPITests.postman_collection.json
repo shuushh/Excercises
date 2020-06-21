@@ -232,12 +232,10 @@
 					"script": {
 						"id": "9ac63d66-8073-4b11-9c26-99fba237a19a",
 						"exec": [
-							"//Get \"cities\" variable\r",
 							"let cities = pm.environment.get(\"cities\");\r",
 							"\r",
-							"//Run a loop for each array item and execute request for a given city\r",
 							"if (cities && cities.length >= 0){\r",
-							"    //Run request names \"Cities2\" from a collection\r",
+							"\r",
 							"    pm.test(\"Status code is 200\", () => {\r",
 							"        pm.response.to.have.status(200);\r",
 							"        pm.response.to.be.json; }\r",
@@ -252,7 +250,6 @@
 							"        pm.test(\"Opps.. Check if a city name is correct\", () => {\r",
 							"        pm.expect(jsonData.name).to.eql(pm.environment.get(\"city_name\")); })\r",
 							"    }\r",
-							"\r",
 							"    postman.setNextRequest(\"Check coordinates support\");\r",
 							"} else {\r",
 							"    //If array has no indexes left, unset variable (this allows for multiple itterations to be run in Postman Runner with the same preset data)\r",
@@ -335,7 +332,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "b91c3807-fa6a-4a4e-8e6e-a62ee756c5ae",
+						"id": "98919fcd-0e9c-4d15-8e95-35565427a565",
 						"exec": [
 							"let latitude = pm.environment.get(\"latitude\");\r",
 							"let longitude = pm.environment.get(\"longitude\");\r",
@@ -347,14 +344,12 @@
 							"    });\r",
 							"    postman.setNextRequest(\"Check LAT/LON position switch\");\r",
 							"} else {\r",
-							"    //If array has no indexes left, unset variable (this allows for multiple itterations to be run in Postman Runner with the same preset data)\r",
-							"    postman.setNextRequest(\"Schema Validation\");\r",
-							"    pm.environment.unset(\"latitude\");\r",
-							"    pm.environment.unset(\"longitude\");\r",
+							"    pm.test(\"Status code is 200\", () => {\r",
+							"        pm.response.to.have.status(200);\r",
+							"        pm.response.to.be.json;\r",
+							"    });\r",
 							"    console.log(\"No more coordinates left. Resetting variable to initial array\");\r",
 							"}\r",
-							"\r",
-							"\r",
 							"\r",
 							""
 						],
@@ -364,12 +359,10 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "62954a6b-d2a0-44f8-b8c3-fefdc2c302e0",
+						"id": "4d132410-da58-4b8e-a7e0-cf4389a3fdf4",
 						"exec": [
 							"let latitude = pm.environment.get(\"latitude\");\r",
 							"let longitude = pm.environment.get(\"longitude\");\r",
-							"\r",
-							"console.log(latitude + \", \" + longitude);\r",
 							"\r",
 							"let currentLatitude = latitude.shift();\r",
 							"let currentLongitude = longitude.shift();\r",
@@ -431,27 +424,25 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "d4750643-edd0-475e-a1d2-9eb63c2e6123",
+						"id": "7df87efd-942b-43c8-895f-242c65ec3482",
 						"exec": [
 							"let latitude = pm.environment.get(\"longitude\");\r",
 							"let longitude = pm.environment.get(\"latitude\");\r",
 							"\r",
-							"if (latitude.length && longitude.length >= 0) {\r",
+							"if (latitude.length && longitude.length > 0) {\r",
 							"    pm.test(\"Status code is 200\", () => {\r",
 							"        pm.response.to.have.status(200);\r",
 							"        pm.response.to.be.json;\r",
 							"    });\r",
 							"    postman.setNextRequest(\"Check city name\");\r",
 							"} else {\r",
-							"    pm.environment.unset(\"latitude\");\r",
-							"    pm.environment.unset(\"longitude\");\r",
+							"    pm.test(\"Status code is 200\", () => {\r",
+							"        pm.response.to.have.status(200);\r",
+							"        pm.response.to.be.json;\r",
+							"    });\r",
 							"    console.log(\"No more coordinates left. Resetting variable to initial array\");\r",
 							"    postman.setNextRequest(\"Schema Validation\");\r",
-							"}\r",
-							"\r",
-							"\r",
-							"\r",
-							""
+							"}"
 						],
 						"type": "text/javascript"
 					}
@@ -459,7 +450,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "c197da83-bbe8-4e56-9d01-6404eee06571",
+						"id": "3c3839a1-1216-49e9-85e5-ecab5ba14455",
 						"exec": [
 							""
 						],
@@ -516,7 +507,6 @@
 					"script": {
 						"id": "029511ed-dcd8-4f41-b349-6a3c50eb418d",
 						"exec": [
-							"//Validate JSON schema for random keys; FAIL expected for\"feels_like\" property\r",
 							"let expectedOutput = {\r",
 							"    \"type\": \"object\",\r",
 							"    \"properties\": {\r",
@@ -558,7 +548,9 @@
 							"    pm.response.to.have.jsonSchema(expectedOutput);\r",
 							"});\r",
 							"postman.setNextRequest();\r",
-							"pm.environment.unset(\"appid\");"
+							"pm.environment.unset(\"appid\");\r",
+							"pm.environment.unset(\"latitude\");\r",
+							"pm.environment.unset(\"longitude\");"
 						],
 						"type": "text/javascript"
 					}
@@ -568,7 +560,7 @@
 					"script": {
 						"id": "20fc3a7d-a9e2-424e-8fa8-da2143d43c63",
 						"exec": [
-							"let cities = pm.environment.get(\"cities\");"
+							"//let cities = pm.environment.get(\"cities\");"
 						],
 						"type": "text/javascript"
 					}
