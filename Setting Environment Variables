@@ -1,0 +1,25 @@
+let countriesArray = pm.response.json();
+
+let capitals = [];
+let lats = [];
+let lons = [];
+
+
+for(i=0; i < countriesArray.length; i++) {
+    if(countriesArray[i].subregion == "Eastern Europe") {
+        let capital = countriesArray[i].capital;
+        let lat = countriesArray[i].latlng.slice(0,1);
+        let lon = countriesArray[i].latlng.slice(1);
+        capitals.push(capital);
+        lats.push(lat);
+        lons.push(lon);
+    }
+}
+
+pm.environment.set("cities", capitals);
+pm.environment.unset("city_name");
+
+pm.environment.set("latitude", lats);
+pm.environment.set("longitude", lons);
+pm.environment.unset("lat");
+pm.environment.unset("lon");
