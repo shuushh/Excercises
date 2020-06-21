@@ -1,0 +1,30 @@
+// PRE REQUEST SCRIPT
+let latitude = pm.environment.get("latitude");
+let longitude = pm.environment.get("longitude");
+
+let currentLatitude = latitude.shift();
+let currentLongitude = longitude.shift();
+
+pm.environment.set("lat", currentLatitude);
+pm.environment.set("lon", currentLongitude);
+pm.environment.set("latitude", latitude);
+pm.environment.set("longitude", longitude);
+
+// TEST SCRIPT
+let latitude = pm.environment.get("latitude");
+let longitude = pm.environment.get("longitude");
+
+if (latitude.length && longitude.length >= 0) {
+    pm.test("Status code is 200", () => {
+        pm.response.to.have.status(200);
+        pm.response.to.be.json;
+    });
+    postman.setNextRequest("Check LAT/LON position switch");
+} else {
+    pm.test("Status code is 200", () => {
+        pm.response.to.have.status(200);
+        pm.response.to.be.json;
+    });
+    console.log("No more coordinates left. Resetting variable to initial array");
+}
+
