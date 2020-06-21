@@ -19,3 +19,14 @@ Generated sample report preview can be accessed <a href="https://htmlpreview.git
 2. Select downloaded .json file and hit `import`
 3. Set global variable `url` to `api.openweathermap.org/data/2.5/weather`
 4. Open `Runner`, select the collection and run it
+
+## What was tested
+* Check if unauthorized access is possible
+* Check if city name is valid
+* Check if given coordinates are accepted
+* Check if switching `latitude` and `longitude` coordinated gives no error
+* Validate response JSON schema
+
+Because OpenWeather API allows only reading mock information, most tests were checking for status code 200 to be true. Few requests can be considered as fillers to provide a cohesive run and somewhat imitate data validation.
+I've used https://restcountries.eu/ API to dynamically get a list of cities, so a multiple checks could be carried out. It can be changed/updated in `Set ENVIRONMENT variables` request by modifying the `if`. 
+As an additional test I've ran a JSON schema validation to a somewhat mocked schema (took some parts of OpenWeather response JSON) and expected it to be valid.
