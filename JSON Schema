@@ -1,0 +1,44 @@
+let expectedOutput = {
+    "type": "object",
+    "properties": {
+        "coord": {
+             "type": "object",
+             "properties": {
+                 "lon": {"type": "number"},
+                 "lat": {"type": "number"}
+             }
+         },
+         "weather": {
+             "type": "array",
+             "items": {
+                 "type": "object",
+                 "properties": {
+                    "id": {"type": "number"},
+                    "main": {"type": "string"},
+                    "description": {"type": "string"},
+                    "icon": {"type": "string"}
+                 }
+             },
+             "additionalItems": false,
+             "require": ["id", "main", "description", "icon"]              
+         },
+         "name": {"type": "string"},
+         "main": {
+             "type": "object",
+             "properties": {
+                 "temp": {"type": "number"},
+                 "feels_like": {"type": "number"}
+             },
+             "require": ["temp"]
+        }
+    },
+    "require": ["weather", "name", "main"]
+ };
+
+pm.test('Schema validation', () => {
+    pm.response.to.have.jsonSchema(expectedOutput);
+});
+postman.setNextRequest();
+pm.environment.unset("appid");
+pm.environment.unset("latitude");
+pm.environment.unset("longitude");
