@@ -21,9 +21,9 @@ Generated sample report preview can be accessed <a href="https://htmlpreview.git
 
 _Full report can be downloaded from the repository or generated via `newman` CLI_
 
-### To run a test suite on your computer you will have to download collection `.json` file from this repository and import it to POSTMAN
+### To run a test suite on your computer you will have to download repository archive with collection `.json` file and import it to POSTMAN
 1. Open Postman and look for `Import` button
-2. Select downloaded .json file and hit `import`
+2. Select downloaded .json file from `Excercises-master` folder and hit `import`
 3. Set global variable `url` to `api.openweathermap.org/data/2.5/weather`
 4. Open `Runner`, select the collection and run it
 
