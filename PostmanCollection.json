@@ -1,0 +1,755 @@
+{
+	"info": {
+		"_postman_id": "0d37b47d-8d75-46a0-ba74-6b60ff1a5c6e",
+		"name": "OpenWeather API Tests",
+		"description": "Provide OpenWeather API with a set of variables fetched from another API (https://restcountries.eu) and check its validity.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Check Authorization",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "0e970e5e-6c74-4a39-b3e4-79a8463f6fbd",
+						"exec": [
+							"pm.environment.unset(\"appid\");\r",
+							"\r",
+							"pm.sendRequest(\"api.openweathermap.org/data/2.5/weather?appid={{appid}}\", function (err, response) {\r",
+							"    if(response.json().cod == 401) { \r",
+							"        console.log(\"Seems like you have an issue with API key. Setting up your authentication\");\r",
+							"        postman.setNextRequest(\"Authorization Fix\");\r",
+							"    };\r",
+							"\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "edad8a66-53c7-4560-8538-dfa74c816840",
+						"exec": [
+							"pm.test(\"Authorization failed\", ()=> {\r",
+							"    pm.response.to.have.status(200);\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "api.openweathermap.org/data/2.5/weather?appid={{appid}}&units=metric&q=Vilnius",
+					"host": [
+						"api",
+						"openweathermap",
+						"org"
+					],
+					"path": [
+						"data",
+						"2.5",
+						"weather"
+					],
+					"query": [
+						{
+							"key": "appid",
+							"value": "{{appid}}"
+						},
+						{
+							"key": "units",
+							"value": "metric"
+						},
+						{
+							"key": "q",
+							"value": "Vilnius"
+						}
+					]
+				},
+				"description": "Imitate autorization check for access to OpenWeather API. \r\nCheck if API key is valid.\r\n\r\nExpected outcome: Status received as 200."
+			},
+			"response": []
+		},
+		{
+			"name": "Authorization Fix",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "6e0deb52-ab9b-404c-97c9-fe2fbc6f146d",
+						"exec": [
+							"pm.environment.set(\"appid\", \"a2bca9e4ae1f81b88dadf9bd538c09da\");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "1168735d-1539-4a47-823a-fb097400fa69",
+						"exec": [
+							"pm.test(\"Authorization passed\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"postman.setNextRequest(\"Set ENVIRONMENT variables\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "api.openweathermap.org/data/2.5/weather?appid={{appid}}&units=metric&q=Vilnius",
+					"host": [
+						"api",
+						"openweathermap",
+						"org"
+					],
+					"path": [
+						"data",
+						"2.5",
+						"weather"
+					],
+					"query": [
+						{
+							"key": "appid",
+							"value": "{{appid}}"
+						},
+						{
+							"key": "units",
+							"value": "metric"
+						},
+						{
+							"key": "q",
+							"value": "Vilnius"
+						}
+					]
+				},
+				"description": "Imitate API key update."
+			},
+			"response": []
+		},
+		{
+			"name": "Set ENVIRONMENT variables",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0931f49c-b73c-43b2-9e84-53b3d643a2c8",
+						"exec": [
+							"//\r",
+							"let countriesArray = pm.response.json();\r",
+							"\r",
+							"let capitals = [];\r",
+							"let lats = [];\r",
+							"let lons = [];\r",
+							"\r",
+							"\r",
+							"for(i=0; i < countriesArray.length; i++) {\r",
+							"    if(countriesArray[i].subregion == \"Eastern Europe\") {\r",
+							"        let capital = countriesArray[i].capital;\r",
+							"        let lat = countriesArray[i].latlng.slice(0,1);\r",
+							"        let lon = countriesArray[i].latlng.slice(1);\r",
+							"        capitals.push(capital);\r",
+							"        lats.push(lat);\r",
+							"        lons.push(lon);\r",
+							"    }\r",
+							"}\r",
+							"\r",
+							"pm.environment.set(\"cities\", capitals);\r",
+							"pm.environment.unset(\"city_name\");\r",
+							"\r",
+							"pm.environment.set(\"latitude\", lats);\r",
+							"pm.environment.set(\"longitude\", lons);\r",
+							"pm.environment.unset(\"lat\");\r",
+							"pm.environment.unset(\"lon\");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "a90da677-5d17-4c40-ac18-72265e451ba2",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [],
+					"options": {
+						"formdata": {}
+					}
+				},
+				"url": {
+					"raw": "https://restcountries.eu/rest/v2/region/europe",
+					"protocol": "https",
+					"host": [
+						"restcountries",
+						"eu"
+					],
+					"path": [
+						"rest",
+						"v2",
+						"region",
+						"europe"
+					]
+				},
+				"description": "Get a list of countries from https://restcountries.eu and set ENVIRONMENT variables for later use in OpenWeather API tests.\r\nVariables set for `City`, `Latitude` and `Longitude`."
+			},
+			"response": []
+		},
+		{
+			"name": "Check city name",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9ac63d66-8073-4b11-9c26-99fba237a19a",
+						"exec": [
+							"let cities = pm.environment.get(\"cities\");\r",
+							"\r",
+							"if (cities && cities.length >= 0){\r",
+							"\r",
+							"    pm.test(\"Status code is 200\", () => {\r",
+							"        pm.response.to.have.status(200);\r",
+							"        pm.response.to.be.json; }\r",
+							"        );\r",
+							"\r",
+							"    let jsonData = pm.response.json();\r",
+							"\r",
+							"    if(jsonData.name == pm.environment.get(\"city_name\")) {\r",
+							"        pm.test(\"A Perfect Match: \" + jsonData.name + \" = \" + pm.environment.get(\"city_name\"), () => {\r",
+							"        pm.expect(jsonData.name).to.eql(pm.environment.get(\"city_name\")); })\r",
+							"        } else {\r",
+							"        pm.test(\"Opps.. Check if a city name is correct\", () => {\r",
+							"        pm.expect(jsonData.name).to.eql(pm.environment.get(\"city_name\")); })\r",
+							"    }\r",
+							"    postman.setNextRequest(\"Check coordinates support\");\r",
+							"} else {\r",
+							"    //If array has no indexes left, unset variable (this allows for multiple itterations to be run in Postman Runner with the same preset data)\r",
+							"    //postman.setNextRequest(\"Schema Validation\");\r",
+							"    pm.environment.unset(\"cities\");\r",
+							"    console.log(\"No more cities left. Resetting variable to initial array\");\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "17ff74ff-b605-493a-bb82-7b03ac274f5d",
+						"exec": [
+							"//Get \"cities\" variable\r",
+							"let cities = pm.environment.get(\"cities\");\r",
+							"\r",
+							"/*//If it does not exist, create one with given array\r",
+							"if(!cities){\r",
+							"cities = [\"London\",\"Vilnius\", \"Paris\", \"Moscow\", \"Tokyo\"];\r",
+							"}*/\r",
+							"\r",
+							"//Check if everything is ok for now\r",
+							"console.log(cities);\r",
+							"\r",
+							"//Remove first index from array and set it as a variable\r",
+							"let currentCity = cities.shift();\r",
+							"//Set \"cuurentCity\" variable as a \"city_name\" variable\r",
+							"pm.environment.set(\"city_name\", currentCity);\r",
+							"//Set new \"cities\" variable\r",
+							"pm.environment.set(\"cities\", cities);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [],
+					"options": {
+						"formdata": {}
+					}
+				},
+				"url": {
+					"raw": "{{url}}?q={{city_name}}&units=metric&appid={{appid}}",
+					"host": [
+						"{{url}}"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "{{city_name}}"
+						},
+						{
+							"key": "units",
+							"value": "metric"
+						},
+						{
+							"key": "appid",
+							"value": "{{appid}}"
+						}
+					]
+				},
+				"description": "Get capital names and add them to an array which is then fed to OpenWeather API to check if requests \"By Name\" are working correctly. When the array is empty - unset it, run \"Schema validation\" test and start from the beginning (if more than one iteration). </br>\r\nRun two tests:<br>\r\n1. Test if response is successful aka 200\r\n2. Test if city name is not misspelled and matches between `restcountries` and `openweather` APIs</br></br>\r\n\r\nExpected outcome: \r\n1. Success (200)\r\n2. Success (names match)"
+			},
+			"response": []
+		},
+		{
+			"name": "Check coordinates support",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "98919fcd-0e9c-4d15-8e95-35565427a565",
+						"exec": [
+							"let latitude = pm.environment.get(\"latitude\");\r",
+							"let longitude = pm.environment.get(\"longitude\");\r",
+							"\r",
+							"if (latitude.length && longitude.length >= 0) {\r",
+							"    pm.test(\"Status code is 200\", () => {\r",
+							"        pm.response.to.have.status(200);\r",
+							"        pm.response.to.be.json;\r",
+							"    });\r",
+							"    postman.setNextRequest(\"Check LAT/LON position switch\");\r",
+							"} else {\r",
+							"    pm.test(\"Status code is 200\", () => {\r",
+							"        pm.response.to.have.status(200);\r",
+							"        pm.response.to.be.json;\r",
+							"    });\r",
+							"    console.log(\"No more coordinates left. Resetting variable to initial array\");\r",
+							"}\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "4d132410-da58-4b8e-a7e0-cf4389a3fdf4",
+						"exec": [
+							"let latitude = pm.environment.get(\"latitude\");\r",
+							"let longitude = pm.environment.get(\"longitude\");\r",
+							"\r",
+							"let currentLatitude = latitude.shift();\r",
+							"let currentLongitude = longitude.shift();\r",
+							"\r",
+							"pm.environment.set(\"lat\", currentLatitude);\r",
+							"pm.environment.set(\"lon\", currentLongitude);\r",
+							"pm.environment.set(\"latitude\", latitude);\r",
+							"pm.environment.set(\"longitude\", longitude);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [],
+					"options": {
+						"formdata": {}
+					}
+				},
+				"url": {
+					"raw": "{{url}}?lat={{lat}}&lon={{lon}}&units=metric&appid={{appid}}",
+					"host": [
+						"{{url}}"
+					],
+					"query": [
+						{
+							"key": "lat",
+							"value": "{{lat}}"
+						},
+						{
+							"key": "lon",
+							"value": "{{lon}}"
+						},
+						{
+							"key": "units",
+							"value": "metric"
+						},
+						{
+							"key": "appid",
+							"value": "{{appid}}"
+						}
+					]
+				},
+				"description": "Get capital coordinates for OpenWeather API to test from an array of coordinates.\r\nWhen coordinates array is empty - unset it</br>\r\nRun two tests:<br>\r\n1. Test if response is successful aka 200</br></br>\r\n\r\nExpected outcome:</br>\r\n1. Success (200)"
+			},
+			"response": []
+		},
+		{
+			"name": "Check LAT/LON position switch",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7df87efd-942b-43c8-895f-242c65ec3482",
+						"exec": [
+							"let latitude = pm.environment.get(\"longitude\");\r",
+							"let longitude = pm.environment.get(\"latitude\");\r",
+							"\r",
+							"if (latitude.length && longitude.length > 0) {\r",
+							"    pm.test(\"Status code is 200\", () => {\r",
+							"        pm.response.to.have.status(200);\r",
+							"        pm.response.to.be.json;\r",
+							"    });\r",
+							"    postman.setNextRequest(\"Check city name\");\r",
+							"} else {\r",
+							"    pm.test(\"Status code is 200\", () => {\r",
+							"        pm.response.to.have.status(200);\r",
+							"        pm.response.to.be.json;\r",
+							"    });\r",
+							"    console.log(\"No more coordinates left. Resetting variable to initial array\");\r",
+							"    postman.setNextRequest(\"Schema Validation\");\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "3c3839a1-1216-49e9-85e5-ecab5ba14455",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [],
+					"options": {
+						"formdata": {}
+					}
+				},
+				"url": {
+					"raw": "{{url}}?lat={{lon}}&lon={{lat}}&units=metric&appid={{appid}}",
+					"host": [
+						"{{url}}"
+					],
+					"query": [
+						{
+							"key": "lat",
+							"value": "{{lon}}"
+						},
+						{
+							"key": "lon",
+							"value": "{{lat}}"
+						},
+						{
+							"key": "units",
+							"value": "metric"
+						},
+						{
+							"key": "appid",
+							"value": "{{appid}}"
+						}
+					]
+				},
+				"description": "Use `latitude` data as `longitude` and check for errors</br>\r\nRun tests to see if response is successful<br>\r\nExpected outcome: Status 200"
+			},
+			"response": []
+		},
+		{
+			"name": "Schema Validation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "029511ed-dcd8-4f41-b349-6a3c50eb418d",
+						"exec": [
+							"let expectedOutput = {\r",
+							"    \"type\": \"object\",\r",
+							"    \"properties\": {\r",
+							"        \"coord\": {\r",
+							"             \"type\": \"object\",\r",
+							"             \"properties\": {\r",
+							"                 \"lon\": {\"type\": \"number\"},\r",
+							"                 \"lat\": {\"type\": \"number\"}\r",
+							"             }\r",
+							"         },\r",
+							"         \"weather\": {\r",
+							"             \"type\": \"array\",\r",
+							"             \"items\": {\r",
+							"                 \"type\": \"object\",\r",
+							"                 \"properties\": {\r",
+							"                    \"id\": {\"type\": \"number\"},\r",
+							"                    \"main\": {\"type\": \"string\"},\r",
+							"                    \"description\": {\"type\": \"string\"},\r",
+							"                    \"icon\": {\"type\": \"string\"}\r",
+							"                 }\r",
+							"             },\r",
+							"             \"additionalItems\": false,\r",
+							"             \"require\": [\"id\", \"main\", \"description\", \"icon\"]              \r",
+							"         },\r",
+							"         \"name\": {\"type\": \"string\"},\r",
+							"         \"main\": {\r",
+							"             \"type\": \"object\",\r",
+							"             \"properties\": {\r",
+							"                 \"temp\": {\"type\": \"number\"},\r",
+							"                 \"feels_like\": {\"type\": \"number\"}\r",
+							"             },\r",
+							"             \"require\": [\"temp\"]\r",
+							"        }\r",
+							"    },\r",
+							"    \"require\": [\"weather\", \"name\", \"main\"]\r",
+							" };\r",
+							"\r",
+							"pm.test('Schema validation', () => {\r",
+							"    pm.response.to.have.jsonSchema(expectedOutput);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "20fc3a7d-a9e2-424e-8fa8-da2143d43c63",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "api.openweathermap.org/data/2.5/weather?q={{city_name}}&units=metric&appid={{appid}}",
+					"host": [
+						"api",
+						"openweathermap",
+						"org"
+					],
+					"path": [
+						"data",
+						"2.5",
+						"weather"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "{{city_name}}"
+						},
+						{
+							"key": "units",
+							"value": "metric"
+						},
+						{
+							"key": "appid",
+							"value": "{{appid}}"
+						}
+					]
+				},
+				"description": "Run a test on a part of JSON schema to check if returned JSON meets schema requirements.\r\nExpected outcome: Schema is valid"
+			},
+			"response": []
+		},
+		{
+			"name": "Check invalid data response for city",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5525f5a9-75a6-431c-bbba-4a3440ad81d0",
+						"exec": [
+							"pm.environment.set(\"dummy\", \"Vilniius\")\r",
+							"\r",
+							"pm.test(\"Incorrect city name should return 404\", () => {\r",
+							"    pm.response.to.have.status(404)\r",
+							"})\r",
+							"\r",
+							"pm.environment.unset(\"dummy\");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "0323f4f8-7409-49b4-8c44-38f376223613",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "api.openweathermap.org/data/2.5/weather?q={{dummy}}&units=metric&appid={{appid}}",
+					"host": [
+						"api",
+						"openweathermap",
+						"org"
+					],
+					"path": [
+						"data",
+						"2.5",
+						"weather"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "{{dummy}}"
+						},
+						{
+							"key": "units",
+							"value": "metric"
+						},
+						{
+							"key": "appid",
+							"value": "{{appid}}"
+						}
+					]
+				},
+				"description": "Check for 404 code when city name is incorrect\r\nExpected outcome: 404"
+			},
+			"response": []
+		},
+		{
+			"name": "Check invalid data response for city ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7d613311-9728-4ab1-867d-d5002e971ce3",
+						"exec": [
+							"pm.test(\"Test should fail with a FLOAT as ID (400)\", ()=> {\r",
+							"    pm.response.to.have.status(400);\r",
+							"})\r",
+							"\r",
+							"\r",
+							"postman.setNextRequest();\r",
+							"pm.environment.unset(\"appid\");\r",
+							"pm.environment.unset(\"latitude\");\r",
+							"pm.environment.unset(\"longitude\");\r",
+							"pm.environment.unset(\"dummy\");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "ddf3d183-f3e3-4691-9ca7-1a962335e744",
+						"exec": [
+							"pm.environment.set(\"dummy\", 2172797.3);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "api.openweathermap.org/data/2.5/weather?id={{dummy}}&units=metric&appid={{appid}}",
+					"host": [
+						"api",
+						"openweathermap",
+						"org"
+					],
+					"path": [
+						"data",
+						"2.5",
+						"weather"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "{{dummy}}"
+						},
+						{
+							"key": "units",
+							"value": "metric"
+						},
+						{
+							"key": "appid",
+							"value": "{{appid}}"
+						}
+					]
+				},
+				"description": "Check for 400 code when City ID is a FLOAT.\r\nExpected outcome: 400 Bad Request code"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "5b55934b-7f97-4634-b866-49f05b0e1077",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "a6db601d-af3a-413c-bd6d-3d589af568d4",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
