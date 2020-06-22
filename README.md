@@ -33,9 +33,17 @@ _Full report can be downloaded from the repository or generated via `newman` CLI
 * Check if coordinates are valid and response status
 * Check if switching `latitude` and `longitude` coordinates gives no error
 * Validate response JSON schema
+* Negative testing for City ID param (passing float instead of int)
+* Negative testing for incorrect city name (passing city name with typo)
 
-As OpenWeatherMap API seems to be read-only, most tests are checking for status code 200 to be true. Few requests can be considered as fillers to provide a cohesive run and somewhat imitate data validation. One of which is getting city names from https://restcountries.eu/ API to dynamically set a list of cities/coordinates into a variable which can later be used to do multiple checks for OpenWeatherMap "By city"/"By geographic coordinates" calls. The list of city names AND coordinates can be changed/updated in `Set ENVIRONMENT variables` request by modifying the `if` statement (PLEASE, see https://restcountries.eu/ for further guidance). 
+As OpenWeatherMap API seems to be read-only, most tests are checking for status code 200 to be true. Few requests can be considered as fillers to provide a cohesive run and somewhat imitate data validation. One of which is getting city names from https://restcountries.eu/ API to dynamically set a list of cities/coordinates into a variable which can later be used to do multiple checks for OpenWeatherMap "By city"/"By geographic coordinates" calls. 
+Several requests pass dummy variables for negative testing:
+- passing float for City ID (it should be integer) with an expectation for a bad request
+- passing incorrect city name with expectation for "no content" error
+
+The list of city names AND coordinates can be changed/updated in `Set ENVIRONMENT variables` request by modifying the `if` statement (PLEASE, see https://restcountries.eu/ for further guidance). 
 All data is stored as environment variables during initial request from restcountries.eu API and unset after the first iterration. This allows to run the same set of data multiple times or easily update it and run the suite again with different set of data.
+
 If tests are to be run one by one, it is required to run these requests beforehand - `Check Authorization`,`Authorization Fix`,`Set ENVIRONMENT variables` - as they provide needed data for the tests. Setting _`appid`_ as a global variable with OpenWeatherMap API key should allow to run tests individually. However, setting variables will still be required.
 
 As an additional test I've ran a JSON schema validation to a somewhat mocked schema (took some parts of OpenWeather response JSON) and expected it to be valid.
